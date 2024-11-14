@@ -7,19 +7,17 @@ const PORT = 3000;
 const server = http.createServer((req, res) => {
   // Настройки CORS (добавление поддержки для запросов с любого домена)
   res.setHeader('Access-Control-Allow-Origin', '*'); // Разрешить все домены
-  // Или, если нужно разрешить только определенные домены, замените '*' на нужный адрес:
-  // res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end('<h1>Сервер работает!</h1>');
+
   if (req.method === 'OPTIONS') {
     // Обрабатываем preflight запросы
-    res.writeHead(204);
+    res.writeHead(204); // No Content
     res.end();
     return;
   }
 
+  // Обработка других запросов
   if (req.method === 'GET' && req.url === '/') {
     // Обрабатываем GET-запрос для главной страницы
     fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, data) => {
@@ -35,8 +33,7 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && req.url === '/create-page') {
     const newPagePath = path.join(__dirname, 'new-page.html');
-    const newPageContent = `
-      <!DOCTYPE html>
+    const newPageContent = `<!DOCTYPE html>
       <html lang="ru">
       <head>
         <meta charset="UTF-8" />
@@ -47,8 +44,7 @@ const server = http.createServer((req, res) => {
         <h1>Это новая страница!</h1>
         <p>Эта страница была создана сервером.</p>
       </body>
-      </html>
-    `;
+      </html>`;
 
     fs.writeFile(newPagePath, newPageContent, (err) => {
       if (err) {
