@@ -5,35 +5,34 @@ const path = require('path');
 const PORT = 3000;
 
 const server = http.createServer((req, res) => {
-  // Настройки CORS (добавление поддержки для запросов с любого домена)
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Разрешить все домены
+  // Настройки CORS
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5500'); // Разрешаем запросы с локального сайта
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    // Обрабатываем preflight запросы
-    res.writeHead(204); // No Content
+    res.writeHead(204);
     res.end();
     return;
   }
 
-  // Обработка других запросов
   if (req.method === 'GET' && req.url === '/') {
     // Обрабатываем GET-запрос для главной страницы
     fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, data) => {
       if (err) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Ошибка сервера');
-        return;
+        return; // Выход из функции
       }
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(data);
+      res.end(data); // Завершаем ответ
     });
   }
 
   if (req.method === 'POST' && req.url === '/create-page') {
     const newPagePath = path.join(__dirname, 'new-page.html');
-    const newPageContent = `<!DOCTYPE html>
+    const newPageContent = `
+      <!DOCTYPE html>
       <html lang="ru">
       <head>
         <meta charset="UTF-8" />
@@ -44,14 +43,17 @@ const server = http.createServer((req, res) => {
         <h1>Это новая страница!</h1>
         <p>Эта страница была создана сервером.</p>
       </body>
-      </html>`;
+      </html>
+    `;
 
     fs.writeFile(newPagePath, newPageContent, (err) => {
       if (err) {
+        console.error('Ошибка записи файла:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Ошибка при создании страницы', error: err.message }));
-        return;
+        return; // Выход из функции
       }
+      console.log('Страница успешно создана');
       res.writeHead(201, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ message: 'Страница успешно создана' }));
     });
@@ -61,6 +63,6 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Сервер запущен на http://0.0.0.0:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Сервер работает на http://150.241.99.160:${PORT}`);
 });
