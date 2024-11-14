@@ -5,12 +5,15 @@ const path = require('path');
 const PORT = 3000;
 
 const server = http.createServer((req, res) => {
-  // Настройки CORS
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5500'); // Разрешаем запросы с локального сайта
+  // Настройки CORS (добавление поддержки для запросов с любого домена)
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Разрешить все домены
+  // Или, если нужно разрешить только определенные домены, замените '*' на нужный адрес:
+  // res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
+    // Обрабатываем preflight запросы
     res.writeHead(204);
     res.end();
     return;
@@ -22,10 +25,10 @@ const server = http.createServer((req, res) => {
       if (err) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Ошибка сервера');
-        return; // Выход из функции
+        return;
       }
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(data); // Завершаем ответ
+      res.end(data);
     });
   }
 
@@ -48,12 +51,10 @@ const server = http.createServer((req, res) => {
 
     fs.writeFile(newPagePath, newPageContent, (err) => {
       if (err) {
-        console.error('Ошибка записи файла:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Ошибка при создании страницы', error: err.message }));
-        return; // Выход из функции
+        return;
       }
-      console.log('Страница успешно создана');
       res.writeHead(201, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ message: 'Страница успешно создана' }));
     });
@@ -64,5 +65,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Сервер работает на http://150.241.99.160:${PORT}`);
+  console.log(`Сервер запущен на http://150.241.99.160:${PORT}`);
 });
